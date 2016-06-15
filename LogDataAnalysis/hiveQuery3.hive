@@ -1,0 +1,9 @@
+use click_stream;
+
+--Determine hits per page in the web application.
+
+INSERT OVERWRITE DIRECTORY '${OUTPUT}'
+select requestpage, count(*) as hits
+from clicklogdata
+group by requestpage;
+

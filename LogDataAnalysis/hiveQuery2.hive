@@ -1,0 +1,12 @@
+use click_stream;
+
+--Determine users with highest number of hits
+--Top 10 users by hits
+
+INSERT OVERWRITE DIRECTORY '${OUTPUT}'
+select originatingip, count(*) as hits
+from clicklogdata
+group by originatingip
+order by hits desc
+LIMIT 10;
+

@@ -1,0 +1,8 @@
+use click_stream;
+
+--Determine number of unique users per hour/day/week
+
+INSERT OVERWRITE DIRECTORY '${OUTPUT}'
+select year, month, day, count(distinct(originatingip)) as unique_users
+from clicklogdata
+group by year, month, day;

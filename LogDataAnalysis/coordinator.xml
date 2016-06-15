@@ -1,0 +1,63 @@
+<coordinator-app name="coord-app-anu"
+  frequency="${coord:days(1)}"
+  start="${startTime}" end="${endTime}" timezone="${timeZone}"
+  xmlns="uri:oozie:coordinator:0.2">
+ 
+  <controls>
+    <concurrency>${concurrency}</concurrency>
+    <execution>${execution}</execution>
+    <throttle>${throttle}</throttle>
+  </controls>
+
+ 
+  <datasets>
+    <!-- Naming convention used here:
+          [e]dinfra
+           ->  'din': Data INput or OUTput 
+            -> '[e]': Event (as opposed to dataset)
+    -->
+    <dataset name="dIn" frequency="${coord:days(1)}"
+             initial-instance="${dsInitialInstance}" timezone="${timeZone}">
+      <uri-template>${dsURITemplate}</uri-template>
+      <done-flag></done-flag>
+    </dataset>
+    
+  </datasets>
+
+  <!-- Select the data (in our case the day) that we want to process
+     For more info on this, see: http://tinyurl.com/q74oom7 -->
+  <input-events>
+    <data-in name="inEvent" dataset="dIn">
+      <instance>${coord:current(-1)}</instance>
+    </data-in>
+  </input-events>
+ 
+
+ <!-- Setup the actual workflow, let it know where we found new
+      data ('inputDir') and where we require the workflow to store
+      the results ('outputDir') -->
+  <action>
+    <workflow>
+      <app-path>${workflowPath}</app-path>
+      <configuration>
+        <property>
+          <name>inputPath</name>
+          <value>${coord:dataIn('inEvent')}</value>
+        </property>
+        <property>
+          <name>regEx</name>
+          <value>${parseInputRegEx}</value>
+        </property>
+        <property>
+          <name>zoneRegEx</name>
+          <value>${zoneRegEx}</value>
+        </property>
+        <property>
+          <name>browserRegEx</name>
+          <value>${browserRegEx}</value>
+        </property>
+     </configuration>
+     
+   </workflow>
+  </action>
+</coordinator-app>

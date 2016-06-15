@@ -1,0 +1,4 @@
+use click_stream;
+
+INSERT OVERWRITE DIRECTORY '${OUTPUT}'
+SELECT distinct(browser) from clicklogdata;

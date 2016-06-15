@@ -1,0 +1,193 @@
+<workflow-app name="ClickStream-project" xmlns="uri:oozie:workflow:0.2">
+    <start to="hive-stage-table"/>
+
+    <action name="hive-stage-table">
+    	<hive xmlns="uri:oozie:hive-action:0.2">
+     	     <job-tracker>${jobTracker}</job-tracker>
+      	     <name-node>${nameNode}</name-node>
+      	     <job-xml>${hiveSiteXml}</job-xml>
+	     <script>${hiveStagingScript}</script>
+    	</hive>
+    	<ok to="pig-node"/>
+    	<error to="hive-staging-fail"/>
+   </action>
+   <kill name="hive-staging-fail">
+   	<message>Hive Staging Table Creation failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+   </kill>
+
+    <action name="pig-node">
+  	<pig>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <script>${pigScript}</script>
+            	<param>input=${inputPath}</param>
+            	<param>regEx="${regEx}"</param>
+            	<param>zoneRegEx="${zoneRegEx}"</param>
+            	<param>browserRegEx="${browserRegEx}"</param>
+            <file>${hiveSiteXml}</file>
+       </pig>
+       <ok to="hive-load-final"/>
+       <error to="pig-fail"/>
+    </action>
+    <kill name="pig-fail">
+             <message>Pig failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="hive-load-final">
+    	<hive xmlns="uri:oozie:hive-action:0.2">
+             <job-tracker>${jobTracker}</job-tracker>
+             <name-node>${nameNode}</name-node>
+             <job-xml>${hiveSiteXml}</job-xml>
+             <script>${hiveLoadToPartitionTableScript}</script>
+        </hive>
+        <ok to="forking"/>
+        <error to="hive-final-fail"/>
+    </action>
+    <kill name="hive-final-fail">
+         <message>Hive Load final table failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+
+    <fork name="forking">
+    	<path start="hive-node-query1"/>
+        <path start="hive-node-query2"/>
+        <path start="hive-node-query3"/>
+        <path start="hive-node-query4"/>
+        <path start="hive-node-query5"/>
+    </fork>
+
+
+   <!--************** hive query 1************** -->
+     <action name="hive-node-query1">
+        <hive xmlns="uri:oozie:hive-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <job-xml>hive-site.xml</job-xml>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <script>${hiveQuery1}</script>
+              <param>OUTPUT=${query1OutputPath}</param>
+        </hive>
+        <ok to="joining"/>
+        <error to="fail-hive-query1"/>
+    </action>
+    <kill name="fail-hive-query1">
+        <message>Hive failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+
+ <!--************** hive query 2************** -->
+     <action name="hive-node-query2">
+        <hive xmlns="uri:oozie:hive-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <job-xml>hive-site.xml</job-xml>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <script>${hiveQuery2}</script>
+              <param>OUTPUT=${query2OutputPath}</param>
+        </hive>
+        <ok to="joining"/>
+        <error to="fail-hive-query2"/>
+    </action>
+    <kill name="fail-hive-query2">
+        <message>Hive failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+ <!--************** hive query 3************** -->
+     <action name="hive-node-query3">
+        <hive xmlns="uri:oozie:hive-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <job-xml>hive-site.xml</job-xml>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <script>${hiveQuery3}</script>
+              <param>OUTPUT=${query3OutputPath}</param>
+        </hive>
+        <ok to="joining"/>
+        <error to="fail-hive-query3"/>
+    </action>
+    <kill name="fail-hive-query3">
+        <message>Hive failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+ <!--************** hive query 4************** -->
+     <action name="hive-node-query4">
+        <hive xmlns="uri:oozie:hive-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <job-xml>hive-site.xml</job-xml>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <script>${hiveQuery4}</script>
+              <param>OUTPUT=${query4OutputPath}</param>
+        </hive>
+        <ok to="joining"/>
+        <error to="fail-hive-query4"/>
+    </action>
+    <kill name="fail-hive-query4">
+        <message>Hive failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+	
+  
+
+   <!--************** hive query 5************** -->
+     <action name="hive-node-query5">
+        <hive xmlns="uri:oozie:hive-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <job-xml>hive-site.xml</job-xml>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <script>${hiveQuery5}</script>
+              <param>OUTPUT=${query5OutputPath}</param>
+        </hive>
+        <ok to="joining"/>
+        <error to="fail-hive-query5"/>
+    </action>
+    <kill name="fail-hive-query5">
+        <message>Hive failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+     <!--************** Join job ************** -->
+     <join name="joining" to="end"/>
+
+    <!-- *** Email Action*** -->
+     <action name="success-email">
+        <email xmlns="uri:oozie:email-action:0.2">
+            <to>priya.prem@gmail.com</to>
+            <cc>amitha.guddu@gmail.com</cc> <!-- cc is optional -->
+            <subject>Log processing Success</subject>
+            <body>The processing has been completed successfully</body>
+        </email>
+        <ok to="end"/>
+        <error to="email-action-fail"/>
+    </action>     
+
+    <kill name="email-action-fail">
+        <message>Unable to send Email, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <end name="end"/>
+</workflow-app>

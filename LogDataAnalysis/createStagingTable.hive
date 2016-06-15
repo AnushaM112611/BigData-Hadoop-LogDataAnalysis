@@ -1,0 +1,11 @@
+use click_stream;
+
+drop table if exists staging_table;
+
+create table staging_table(
+    originatingip string, clientidentity string, userid string, requesttype string, requestpage string,
+    httpprotocolversion string, responsecode int, responsesize int,
+    referrer string, browser string, zone string, year int, month int,
+    week int, day int, hour int)
+    ROW FORMAT DELIMITED
+    FIELDS TERMINATED BY '~';

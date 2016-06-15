@@ -1,0 +1,10 @@
+use click_stream;
+
+-- Determine number of users by geographical location for a time period.
+
+INSERT OVERWRITE DIRECTORY '${OUTPUT}'
+select zone , count(distinct(originatingip)) as unique_users
+from clicklogdata
+where year=2016
+group by zone;
+

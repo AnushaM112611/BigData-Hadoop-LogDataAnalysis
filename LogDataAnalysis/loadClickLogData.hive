@@ -1,0 +1,14 @@
+use click_stream;
+
+create table if not exists clicklogdata(
+    originatingip string, clientidentity string, userid string, requesttype string, requestpage string,
+    httpprotocolversion string, responsecode int, responsesize int,
+    referrer string, browser string) partitioned by (zone string, year int, month int,
+    week int, day int, hour int)
+    ROW FORMAT DELIMITED
+    FIELDS TERMINATED BY '~';
+
+set hive.exec.dynamic.partition.mode=nonstrict;
+
+INSERT INTO TABLE clicklogdata PARTITION(zone, year, month, week, day, hour)
+SELECT * FROM staging_table;
